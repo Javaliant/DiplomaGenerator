@@ -2,6 +2,8 @@
 
 */
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,16 +28,26 @@ public class DiplomaGenerator extends Application {
 
 	@Override
 	public void start(Stage stage) {
-		/*try(Random random = new Random; ) {
-
-		}
+		Random random = new Random();
+		List<String> achievementList = new ArrayList<>();
+		List<String> likeList = new ArrayList<>();
 		List<String> openers = new ArrayList<>();
-		List<String> closers = new ArrayList<>();*/
+		List<String> closers = new ArrayList<>();
+		List<String> buzzwords = new ArrayList<>();
+		List<String> hobbyList = new ArrayList<>();
+
+		scanAndAdd(achievementList, new File("Assets/achievement_comments.txt"));
+		scanAndAdd(likeList, new File("Assets/like_comments.txt"));
+		scanAndAdd(openers, new File("Assets/openers.txt"));
+		scanAndAdd(closers, new File("Assets/closers.txt"));
+		scanAndAdd(buzzwords, new File("Assets/buzzwords.txt"));
+		scanAndAdd(hobbyList, new File("Assets/hobby_comments.txt"));
 
 		BorderPane layout = new BorderPane();
 
 		TextArea result = new TextArea();
 		result.setEditable(false);
+		result.setWrapText(true);
 		layout.setBottom(result);
 
 		Label name = new Label("Name:");
@@ -60,12 +72,16 @@ public class DiplomaGenerator extends Application {
 
 		Button submit = new Button("Submit");
 		submit.setOnAction(e -> {
-			result.setText(nameField.getText() + 
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit." +
-				"\nMaecenas et fermentum est, eget aliquam dolor." +
-				"\nQuisque condimentum condimentum est, eu cursus odio mattis quis."
-				+"\nNam consequat dui non sodales ultrices."
-				+"Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+			result.setText(nameField.getText() + ", " +
+				openers.get(random.nextInt(openers.size())) + "\n" +
+				hobbyList.get(random.nextInt(hobbyList.size())).replaceAll("x", hobbyField.getText()) + "\n" +
+				likeList.get(random.nextInt(likeList.size()))
+					.replaceAll("x", likeField.getText())
+					.replaceAll("z", buzzwords.get(random.nextInt(buzzwords.size()))) + "\n" +
+				achievementList.get(random.nextInt(achievementList.size()))
+					.replaceAll("x", achievementField.getText())
+					.replaceAll("z", buzzwords.get(random.nextInt(buzzwords.size()))) + "\n" +
+				closers.get(random.nextInt(closers.size()))
 			);
 			submit.setText("Regenerate");
 		});
@@ -83,5 +99,15 @@ public class DiplomaGenerator extends Application {
 		stage.getIcons().add(
 			new Image(getClass().getResourceAsStream("Assets/Icon.jpeg")));
 		stage.show();
+	}
+
+	private static void scanAndAdd(List<String> list, File file) {
+		try(Scanner input = new Scanner(file) ) {
+			while (input.hasNextLine()) {
+				list.add(input.nextLine());
+			}
+		} catch (FileNotFoundException notFound) {
+			System.out.println("Cannot find: " + notFound);
+		}
 	}
 }
